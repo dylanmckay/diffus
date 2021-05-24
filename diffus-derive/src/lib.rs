@@ -165,6 +165,8 @@ pub fn derive_diffus(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
     #[cfg(not(feature = "serialize-impl"))]
     let derive_serialize: Option<proc_macro2::TokenStream> = None;
 
+    let common_derives = quote! ( #[derive(Clone)] );
+
     proc_macro::TokenStream::from(match input.data {
         syn::Data::Enum(syn::DataEnum { variants, .. }) => {
             let edit_variants = variants.iter().map(|syn::Variant { ident, fields, .. }| {
@@ -277,6 +279,7 @@ pub fn derive_diffus(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
 
             quote! {
                 #derive_serialize
+                #common_derives
                 #vis enum #edited_ident <#unit_enum_generic_params> #edited_ty_where_clause {
                     #(#edit_variants),*
                 }
@@ -305,6 +308,7 @@ pub fn derive_diffus(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
                 syn::Fields::Named(_) => {
                     quote! {
                         #derive_serialize
+                        #common_derives
                         #vis struct #edited_ident<#edited_ty_generic_params> #edited_ty_where_clause {
                             #edit_fields
                         }
@@ -326,6 +330,7 @@ pub fn derive_diffus(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
                 syn::Fields::Unnamed(_) => {
                     quote! {
                         #derive_serialize
+                        #common_derives
                         #vis struct #edited_ident<#edited_ty_generic_params> ( #edit_fields ) #edited_ty_where_clause;
 
                         impl<#impl_diffable_generic_params> diffus::Diffable<#impl_lifetime> for #ident <#ty_generic_params> #impl_diffable_where_clause {
@@ -345,6 +350,7 @@ pub fn derive_diffus(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
                 syn::Fields::Unit => {
                     quote! {
                         #derive_serialize
+                        #common_derives
                         #vis struct #edited_ident< > #edited_ty_where_clause;
 
                         impl<#impl_lifetime> diffus::Diffable<#impl_lifetime> for #ident< > #impl_diffable_where_clause {

@@ -6,7 +6,7 @@ mod test {
     mod hide {
         use super::*;
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub struct Inside {
             pub p: u32,
         }
@@ -31,10 +31,10 @@ mod test {
         }
     }
 
-    #[derive(Diffus)]
+    #[derive(Clone, Diffus)]
     struct Lifetime<'a>(&'a u32);
 
-    #[derive(Diffus, Debug, PartialEq)]
+    #[derive(Clone, Diffus, Debug, PartialEq)]
     struct Identified {
         id: u32,
         value: u32,
@@ -118,13 +118,13 @@ mod test {
         }
     }
 
-    #[derive(Diffus)]
+    #[derive(Clone, Diffus)]
     enum NestedTest {
         T { test: Test },
     }
 
     #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-    #[derive(Debug, Diffus, PartialEq, Eq)]
+    #[derive(Clone, Debug, Diffus, PartialEq, Eq)]
     enum Test {
         A,
         B(String),
@@ -137,7 +137,7 @@ mod test {
      * Verify enum refering to own type via hashmap
      */
     #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-    #[derive(Debug, Diffus, PartialEq)]
+    #[derive(Clone, Debug, Diffus, PartialEq)]
     enum RecursiveHashMap {
         Node(std::collections::HashMap<u32, RecursiveHashMap>),
         Empty,
@@ -147,7 +147,7 @@ mod test {
      * Verify enum refering to own type via box
      */
     #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-    #[derive(Debug, Diffus, PartialEq)]
+    #[derive(Clone, Debug, Diffus, PartialEq)]
     enum RecursiveBox {
         Boxed(Box<RecursiveBox>),
     }
@@ -155,7 +155,7 @@ mod test {
     /*
      * Verify enums with only Unit variants.
      */
-    #[derive(Diffus)]
+    #[derive(Clone, Diffus)]
     enum EnumNoLifetimeParameter {
         A,
         B,
@@ -167,18 +167,18 @@ mod test {
          */
         use diffus::Diffus;
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub struct VisTestStructUnit;
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub struct VisTestStructTuple(u32);
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub struct VisTestStruct {
             x: u32,
         }
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub enum VisTestEnum {
             A,
             B(u32),
@@ -269,19 +269,19 @@ mod test {
     }
 
     #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-    #[derive(Diffus, Debug, PartialEq)]
+    #[derive(Clone, Diffus, Debug, PartialEq)]
     struct Inner {
         x: String,
         y: u32,
     }
 
-    #[derive(Diffus, Debug, PartialEq)]
+    #[derive(Clone, Diffus, Debug, PartialEq)]
     struct Unit;
 
-    #[derive(Diffus, Debug, PartialEq)]
+    #[derive(Clone, Diffus, Debug, PartialEq)]
     struct Unnamed(u32, String);
 
-    #[derive(Diffus, Debug, PartialEq)]
+    #[derive(Clone, Diffus, Debug, PartialEq)]
     struct Outer {
         inner: Inner,
         lit: i32,
@@ -323,12 +323,12 @@ mod test {
     mod serialize {
         use super::*;
 
-        #[derive(Diffus, Default, serde::Serialize)]
+        #[derive(Clone, Diffus, Default, serde::Serialize)]
         struct SB {
             u: u32,
         }
 
-        #[derive(Diffus, Default, serde::Serialize)]
+        #[derive(Clone, Diffus, Default, serde::Serialize)]
         struct SA {
             b: SB,
             s: String,
@@ -394,7 +394,7 @@ mod test {
     #[test]
     fn struct_containing_str() {
         #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-        #[derive(Diffus, Debug, PartialEq)]
+        #[derive(Clone, Diffus, Debug, PartialEq)]
         struct A<'a> {
             a: &'a str,
         }
@@ -416,11 +416,12 @@ mod test {
     mod generics {
         use diffus::Diffus;
 
-        pub trait Thing {
-            type Foo;
-            type Bar;
+        pub trait Thing : Clone {
+            type Foo: Clone;
+            type Bar: Clone;
         }
 
+        #[derive(Clone)]
         pub struct ConcreteThing;
 
         impl Thing for ConcreteThing {
@@ -428,13 +429,13 @@ mod test {
             type Bar = i64;
         }
 
-        #[derive(Diffus)]
+        #[derive(Clone, PartialEq, Diffus)]
         pub struct TestNamedStruct<A> where A: Thing {
             pub a: A::Foo,
             pub inner: i32,
         }
 
-        #[derive(Diffus)]
+        #[derive(Clone, Diffus)]
         pub enum TestTuple<A> where A: Thing {
             Hello {
                 bar: A::Bar,

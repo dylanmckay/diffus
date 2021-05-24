@@ -3,7 +3,8 @@ use crate::{
     Diffable,
 };
 
-impl<'a, T: Diffable<'a> + 'a> Diffable<'a> for Option<T> {
+impl<'a, T: Diffable<'a> + 'a> Diffable<'a> for Option<T>
+    where T: Clone, T::Diff: Clone {
     type Diff = enm::Edit<'a, Self, T::Diff>;
 
     fn diff(&'a self, other: &'a Self) -> edit::Edit<Self> {

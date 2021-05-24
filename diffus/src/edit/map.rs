@@ -1,7 +1,7 @@
 use crate::Diffable;
 
 #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Edit<'a, T: Diffable<'a> + ?Sized> {
     Copy(&'a T),
     Insert(&'a T),

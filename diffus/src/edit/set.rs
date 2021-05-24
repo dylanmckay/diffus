@@ -8,6 +8,17 @@ pub enum Edit<'a, T: Diffable<'a> + ?Sized> {
     Remove(&'a T),
 }
 
+impl<'a, T> Clone for Edit<'a, T>
+    where T: Diffable<'a> + ?Sized {
+    fn clone(&self) -> Self {
+        match *self {
+            Edit::Copy(a) => Edit::Copy(a),
+            Edit::Insert(a) => Edit::Insert(a),
+            Edit::Remove(a) => Edit::Remove(a),
+        }
+    }
+}
+
 impl<'a, T: Diffable<'a> + ?Sized> Edit<'a, T> {
     pub fn is_copy(&self) -> bool {
         if let Self::Copy(_) = self {

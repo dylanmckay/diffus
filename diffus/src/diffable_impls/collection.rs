@@ -6,7 +6,8 @@ use crate::{
 macro_rules! collection_impl {
     ($($typ:ident),*) => {
         $(
-            impl<'a, T: Same + Diffable<'a> + 'a> Diffable<'a> for $typ<T> {
+            impl<'a, T: Same + Diffable<'a> + 'a> Diffable<'a> for $typ<T>
+                where T: Clone, T::Diff: Clone {
                 type Diff = Vec<collection::Edit<'a, T, T::Diff>>;
 
                 fn diff(&'a self, other: &'a Self) -> edit::Edit<Self> {

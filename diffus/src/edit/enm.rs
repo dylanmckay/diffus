@@ -1,5 +1,5 @@
 #[cfg_attr(feature = "serialize-impl", derive(serde::Serialize))]
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Edit<'a, T: ?Sized, Diff> {
     Copy(&'a T),
     VariantChanged(&'a T, &'a T),
